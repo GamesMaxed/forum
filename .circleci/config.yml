@@ -1,0 +1,58 @@
+version: 2.0
+
+jobs:
+  build:
+    parallelism: 3
+    working-directory: ~/forum
+    docker:
+      - image: circleci/ruby:2.4-node
+        environment:
+          PGHOST: 127.0.0.1
+          PGUSER: forum-ci
+          RAILS_ENV: test
+      - image: circleci/postgres:9-alpine
+        environment:
+          POSTGRES_USER: forum-ci
+          POSTGRES_DB: forum-test
+          POSTGRES_PASSWORD: ""
+
+    steps:
+     - checkout
+
+     # Restore bundle cache
+     - type: cache-restore,
+       name: Restore bundle cache,
+       key: forum-bundle-{{ checksum "Gemfile.lock" }}
+
+     - run:
+        name: Bundle install
+        command: bundle install --path vendor/bundle
+
+     # Store bundle cache
+     - type: cache-save
+       name: Store bundle cache
+       key: rails-demo-bundle-{{ checksum "Gemfile.lock" }}
+       paths:
+        - vendor/bundle
+
+     - run:
+         name: Wait for DB
+         command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+     - run:
+        name: Database setup
+        command: bin/rails db:schema:load --trace
+
+      # Run rspec in parallel
+     - type: shell
+       command: |
+         bundle exec rspec --profile 10 \
+                           --format RspecJunitFormatter \
+                           --out test_results/rspec.xml \
+                           --format progress \
+                           $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+
+
+      # Save test results for timing analysis
+     - store_test_results:
+         path: test_results
