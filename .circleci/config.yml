@@ -2,7 +2,6 @@ version: 2.0
 
 jobs:
   build:
-    parallelism: 3
     working-directory: ~/forum
     docker:
       - image: circleci/ruby:2.4-node-browsers
@@ -45,15 +44,15 @@ jobs:
           command: bundle exec rails db:create
        
       - run:
-          name: Database schema
-          command: bundle exec rails db:schema:load --trace
+          name: Load the database schema
+          command: bundle exec rails db:schema:load
 
       - run:
           name: Run normal tests
           command: bundle exec rails test
 
       - run:
-          name: Run system test
+          name: Run system tests
           command: bundle exec rails test:system
 
       # Save test results for timing analysis
