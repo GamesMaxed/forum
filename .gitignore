@@ -13,5 +13,8 @@
 .byebug_history
 
 # idea
-.idea
+.idea/
 *.iml
+
+# Coverage
+coverage/
