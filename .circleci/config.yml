@@ -50,7 +50,3 @@ jobs:
       - run:
           name: Run normal tests
           command: bundle exec rails test
-
-      - run:
-          name: Push test results to code coverage
-          command: bundle exec coveralls push
