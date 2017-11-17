@@ -1,8 +1,9 @@
+# Setup coverage
 require 'simplecov'
-require 'coveralls'
-
-SimpleCov.formatter = Coveralls::SimpleCov::Formatter
 SimpleCov.start 'rails'
+
+require 'codecov'
+SimpleCov.formatter = SimpleCov::Formatter::Codecov
 
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'

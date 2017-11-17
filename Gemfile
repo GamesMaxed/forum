@@ -45,7 +45,7 @@ group :development, :test do
 
   # Coverage reports
   gem 'simplecov'
-  gem 'coveralls'
+  gem 'codecov'
 end
 
 group :development do
