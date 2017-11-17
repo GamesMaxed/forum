@@ -5,54 +5,57 @@ jobs:
     parallelism: 3
     working-directory: ~/forum
     docker:
-      - image: circleci/ruby:2.4-node
+      - image: circleci/ruby:2.4-node-browsers
         environment:
-          PGHOST: 127.0.0.1
-          PGUSER: forum-ci
+          FORUM_DATABASE_HOST: 127.0.0.1
+          FORUM_DATABASE_USERNAME: forum-ci
+          FORUM_DATABASE_PASSWORD: ""
           RAILS_ENV: test
-      - image: circleci/postgres:9-alpine
+      - image: circleci/postgres:9.6-alpine
         environment:
           POSTGRES_USER: forum-ci
           POSTGRES_DB: forum-test
           POSTGRES_PASSWORD: ""
 
     steps:
-     - checkout
+      - checkout
 
-     # Restore bundle cache
-     - type: cache-restore,
-       name: Restore bundle cache,
-       key: forum-bundle-{{ checksum "Gemfile.lock" }}
+      # Restore bundle cache
+      - cache_restore:
+          name: Restore bundle cache
+          key: forum-bundle-{{ checksum "Gemfile.lock" }}
 
-     - run:
-        name: Bundle install
-        command: bundle install --path vendor/bundle
+      - run:
+          name: Bundle install
+          command: bundle install --path vendor/bundle
 
-     # Store bundle cache
-     - type: cache-save
-       name: Store bundle cache
-       key: rails-demo-bundle-{{ checksum "Gemfile.lock" }}
-       paths:
-        - vendor/bundle
+      # Store bundle cache
+      - cache_save:
+          name: Store bundle cache
+          key: forum-bundle-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
 
-     - run:
-         name: Wait for DB
-         command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
-     - run:
-        name: Database setup
-        command: bin/rails db:schema:load --trace
+      - run:
+          name: Create database
+          command: bundle exec rails db:create
+       
+      - run:
+          name: Database schema
+          command: bundle exec rails db:schema:load --trace
 
-      # Run rspec in parallel
-     - type: shell
-       command: |
-         bundle exec rspec --profile 10 \
-                           --format RspecJunitFormatter \
-                           --out test_results/rspec.xml \
-                           --format progress \
-                           $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+      - run:
+          name: Run normal tests
+          command: bundle exec rails test
 
+      - run:
+          name: Run system test
+          command: bundle exec rails test:system
 
       # Save test results for timing analysis
-     - store_test_results:
-         path: test_results
+      - store_test_results:
+          path: test_results

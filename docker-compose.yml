@@ -1,10 +1,14 @@
 version: '3'
 services:
   db:
-    image: postgres
+    image: postgres:9.6-alpine
   api:
     build: .
     command: ./start.sh
+    environment:
+      FORUM_DATABASE_HOST: db
+      FORUM_DATABASE_USERNAME: postgres
+      FORUM_DATABASE_PASSWORD: ""
     volumes:
      - .:/forum
     ports:

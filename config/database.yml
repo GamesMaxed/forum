@@ -17,9 +17,9 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  host: db
-  username: postgres
-  password:
+  host: <%= ENV.fetch('FORUM_DATABASE_HOST') {"127.0.0.1"} %>
+  username: <%= ENV.fetch('FORUM_DATABASE_USERNAME') {"postgres"} %>
+  password: <%= ENV.fetch('FORUM_DATABASE_PASSWORD') {""} %>
 
   # For details on connection pooling, see Rails configuration guide
   # http://guides.rubyonrails.org/configuring.html#database-pooling
@@ -85,5 +85,3 @@ test:
 production:
   <<: *default
   database: forum_production
-  username: postgres
-  password: <%= ENV['FORUM_DATABASE_PASSWORD'] %>
