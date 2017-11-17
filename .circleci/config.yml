@@ -52,5 +52,5 @@ jobs:
           command: bundle exec rails test
 
       - run:
-          name: Run system tests
-          command: bundle exec rails test:system
+          name: Push test results to code coverage
+          command: bundle exec coveralls push
