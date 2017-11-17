@@ -54,7 +54,3 @@ jobs:
       - run:
           name: Run system tests
           command: bundle exec rails test:system
-
-      # Save test results for timing analysis
-      - store_test_results:
-          path: test_results
