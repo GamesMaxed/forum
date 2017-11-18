@@ -2,8 +2,10 @@ require 'test_helper'
 
 class TopicTest < ActiveSupport::TestCase
   test "A topic requires to have a category" do
-    valid = Topic.new({:name => "Test"}).valid?
-    assert_not valid
+    topic = Topic.new({:name => "Test"})
+
+    assert topic.invalid?
+    assert_not_nil topic.errors[:category]
   end
 
   test "Topic belongs to a category" do

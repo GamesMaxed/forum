@@ -6,16 +6,20 @@ class CategoryTest < ActiveSupport::TestCase
   end
 
   test "Category with only whitespace as name should not be validated" do
-    assert_not Category.new({:name => "   "}).valid?
+    category = Category.new({:name => "   "})
+
+    assert category.invalid?
+    assert_not_nil category.errors[:name]
   end
 
   test "Assert whitespace is trimmed away at the end and in the beginning" do
     category = Category.create({:name => " \nCategory \n\t\n"})
+
     assert_equal "Category", category.name
   end
 
   test "Can contain topics" do
-    category =  Category.create({:name => "Category"})
+    category = Category.create({:name => "Category"})
     first = Topic.create({:name => "Test topic 1", :category => category})
     second = Topic.create({:name => "Test topic 2", :category => category})
 
