@@ -43,6 +43,13 @@ group :development, :test do
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
 
+  # Rspec for BDD
+  gem 'rspec-rails', '~> 3.6'
+  # rspec junit formatter for circleci
+  gem 'rspec_junit_formatter', '~> 0.3'
+  # shoulda matchers for better matching
+  gem 'shoulda-matchers', '~> 3.1'
+
   # Coverage reports
   gem 'simplecov'
   gem 'codecov'
